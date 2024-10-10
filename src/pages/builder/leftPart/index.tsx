@@ -2,16 +2,30 @@ import "./index.scss";
 import { Tabs } from "antd";
 import type { TabsProps } from "antd";
 import * as components from "@/components";
+import { componentIconMap, componentTextMap } from "./utils/iconList";
 
 const LeftPart = () => {
+  const onDragStart = (name: string) => {
+    return () => {
+      window.nowCom = name;
+    };
+  };
+
   const renderComponent = () => {
     return (
-      <div>
+      <div className="componentGroup">
         {Object.keys(components).map((name) => {
+          const Icon = componentIconMap[name];
+          const text = componentTextMap[name];
           return (
-            <div className="componentItem" draggable key={name}>
-              <div style={{ display: "inline-block" }}>
-                <span>{name}</span>
+            <div className="componentItem" key={name}>
+              <div
+                draggable
+                style={{ display: "inline-block" }}
+                onDragStart={onDragStart(name)}
+              >
+                <Icon style={{ marginRight: "10px" }} />
+                <span>{text}</span>
               </div>
             </div>
           );
