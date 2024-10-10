@@ -3,11 +3,15 @@ import { Tabs } from "antd";
 import type { TabsProps } from "antd";
 import * as components from "@/components";
 import { componentIconMap, componentTextMap } from "./utils/iconList";
+import Store from "@/store";
 
 const LeftPart = () => {
   const onDragStart = (name: string) => {
     return () => {
-      window.nowCom = name;
+      Store.dispatch({
+        type: "changeNowCom",
+        value: name,
+      });
     };
   };
 

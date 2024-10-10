@@ -1,25 +1,57 @@
 import "./index.scss";
 import { Input, Tabs } from "antd";
 import type { TabsProps } from "antd";
-import type { ChangeEvent } from "react";
+import { useMemo, useState } from "react";
+import { attributesMap } from "./utils/attributesMap";
+import InputComponent from "./components/InputComponent";
+import store from "@/store";
+import { subscribeHook } from "@/store/subscribe";
+import { ComJson } from "../mainPart";
 
 const RightCom = () => {
+  const storeState = store.getState();
+  const { selectComId } = storeState;
+  const comList = JSON.parse(JSON.stringify(storeState.comList));
+  const selectNode = useMemo(
+    () => comList.find((item: ComJson) => item.comId === selectComId),
+    [comList, selectComId]
+  );
+  subscribeHook();
+
   const getAttributePanel = () => {
+    const comAttributeList = selectNode
+      ? attributesMap[selectNode.comType]
+      : [];
     return (
       <div>
-        <div className="attributeItem">
-          <label>按钮文字：</label>
-          <div className="attributteItemValue">
-            <Input onChange={changeComAttribute} />
-          </div>
-        </div>
+        {comAttributeList.map((item, index) => {
+          return (
+            <div className="attributeItem" key={index}>
+              <label className="attributeLabel">{item.label}</label>
+              <div className="attributteItemValue">
+                <InputComponent
+                  selectNode={selectNode}
+                  {...item}
+                  onChange={changeComAttribute(item.value)}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   };
 
-  const changeComAttribute = (e: ChangeEvent<HTMLInputElement>) => {
-    window.renderCom.caption = e.target.value;
-    window.setComList([...window.comList]);
+  const changeComAttribute = (value: string) => (e: any) => {
+    let attribute = e;
+    if (typeof e === "object") {
+      attribute = e.target.value;
+    }
+    selectNode[value] = attribute;
+    store.dispatch({
+      type: "changeComList",
+      value: comList,
+    });
   };
 
   const items: TabsProps["items"] = [

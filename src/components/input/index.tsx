@@ -1,7 +1,13 @@
-const Input = (props: any) => {
-  const { style } = props;
+import { Input as AntInput } from "antd";
 
-  return <div style={style}>Input</div>;
+const Input = (props: any) => {
+  const { disabled, size, onChange } = props;
+
+  return (
+    <div>
+      <AntInput disabled={disabled} size={size} onChange={onChange} />
+    </div>
+  );
 };
 
 export default Input;

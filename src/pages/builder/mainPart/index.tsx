@@ -2,6 +2,8 @@ import "./index.scss";
 import { DragEvent, useMemo, useRef, useState } from "react";
 import * as components from "@/components";
 import { getDomOffset } from "@/utils";
+import Store from "@/store";
+import { subscribeHook } from "@/store/subscribe";
 
 export interface ComJson {
   comType: string;
@@ -18,9 +20,9 @@ interface Distance {
 
 const MainCom = () => {
   // 存储已拖入的组件类型
-  const [comList, setComList] = useState<ComJson[]>([]);
-  // 保存在当前画布拖拽的节点
-  const [dragCom, setDragCom] = useState<ComJson | null>(null);
+  const comList = JSON.parse(JSON.stringify(Store.getState().comList));
+  // 保存在当前画布拖拽的节点 id
+  const [dragComId, setDragComId] = useState<string>("");
   // 当前选中节点的 comId
   const [selectId, setSelectId] = useState<string>("");
   const mainComRef = useRef<HTMLDivElement>(null);
@@ -31,20 +33,20 @@ const MainCom = () => {
     endLeft: 0,
     endTop: 0,
   });
+  // 拿到当前拖拽的节点类型
+  const nowCom = Store.getState().dragCom;
+  subscribeHook();
 
-  const selectCom = (com: ComJson) => {
+  const selectCom = ({ comId, comType }: ComJson) => {
     return () => {
-      setSelectId(com.comId);
-      window.renderCom = com;
-      window.comList = comList;
-      window.setComList = setComList;
+      setSelectId(comId);
+      Store.dispatch({ type: "changeSelectComId", value: comId });
     };
   };
 
   const onDragStart = (com: ComJson) => {
     return (e: DragEvent) => {
-      window.nowCom = "renderCom";
-      setDragCom(com);
+      setDragComId(com.comId);
       // 鼠标开始位置
       distance.current.startLeft = e.clientX;
       distance.current.startTop = e.clientY;
@@ -56,16 +58,17 @@ const MainCom = () => {
     distance.current.endLeft = e.clientX;
     distance.current.endTop = e.clientY;
     // 判断当前拖拽的节点是从左侧组件栏，还是从画布中拖拽的
-    if (window.nowCom === "renderCom" && dragCom && dragCom.style) {
-      dragCom.style = {
-        ...dragCom.style,
+    if (dragComId) {
+      const node = comList.find((item: ComJson) => item.comId === dragComId);
+      node.style = {
+        ...node.style,
         left:
-          parseInt(dragCom.style.left) +
+          parseInt(node.style.left) +
           e.clientX -
           distance.current.startLeft +
           "px",
         top:
-          parseInt(dragCom.style.top) +
+          parseInt(node.style.top) +
           e.clientY -
           distance.current.startTop +
           "px",
@@ -78,14 +81,19 @@ const MainCom = () => {
         top: e.clientY - containerOffset.top + "px",
         zIndex: 100,
       };
-
-      comList.push({
-        comType: window.nowCom,
+      const comId = `comId_${Date.now()}`;
+      const comNode = {
+        comType: nowCom,
         style,
-        comId: `comId_${Date.now()}`,
-      });
+        comId,
+      };
+      comList.push(comNode);
+      // 拖入之后给予选中状态
+      selectCom(comNode)();
+      // setSelectId(comId);
+      // Store.dispatch({ type: "changeSelectComId", value: comId });
     }
-    setComList([...comList]);
+    Store.dispatch({ type: "changeComList", value: [...comList] });
   };
 
   const onDragOver = (e: DragEvent) => {
@@ -104,7 +112,7 @@ const MainCom = () => {
       onDragOver={onDragOver}
       onDragEnter={onDragEnter}
     >
-      {comList.map((com, index) => {
+      {comList.map((com: ComJson, index: number) => {
         const Com = components[com.comType as keyof typeof components];
         return (
           <div

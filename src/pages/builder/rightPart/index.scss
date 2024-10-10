@@ -8,4 +8,12 @@
   // justify-content: space-between;
   align-items: center;
   padding: 0 10px;
+  margin-bottom: 10px;
+}
+.attributeLabel {
+  width: 100px;
+  margin-right: 5px;
+  white-space: nowrap; /* 防止文字换行 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 超出部分显示省略号 */
 }
