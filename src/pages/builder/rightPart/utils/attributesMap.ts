@@ -1,3 +1,5 @@
+import iconAttributes from "./iconAttributes";
+
 /**
  * 管理不同组件的属性配置
  */
@@ -11,6 +13,7 @@ export interface ComAttributes {
   type: string;
   options?: any[];
   defaultValue?: any;
+  modalType?: string;
 }
 
 const buttonAttributes: ComAttributes[] = [
@@ -48,6 +51,7 @@ const inputAttributes: ComAttributes[] = [
 const attributesMap: AttributesMap = {
   Button: buttonAttributes,
   Input: inputAttributes,
+  Icon: iconAttributes,
 };
 
 export { attributesMap };

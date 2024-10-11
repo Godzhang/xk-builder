@@ -90,8 +90,6 @@ const MainCom = () => {
       comList.push(comNode);
       // 拖入之后给予选中状态
       selectCom(comNode)();
-      // setSelectId(comId);
-      // Store.dispatch({ type: "changeSelectComId", value: comId });
     }
     Store.dispatch({ type: "changeComList", value: [...comList] });
   };

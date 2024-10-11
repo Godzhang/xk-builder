@@ -1,0 +1,31 @@
+.iconList {
+  display: flex;
+  flex-wrap: wrap;
+  height: 400px;
+  overflow: auto;
+}
+
+.iconItem {
+  width:60px;
+  height: 60px;
+  font-size: 18px;
+  display: inline-block;
+  text-align: center;
+  line-height: 60px;
+  cursor: pointer;
+}
+
+.iconItem:hover {
+  background-color: rgb(235, 232, 232);
+}
+
+.activeIcon {
+  width:60px;
+  height: 60px;
+  font-size: 18px;
+  display: inline-block;
+  text-align: center;
+  line-height: 60px;
+  background-color: rgb(235, 232, 232);
+}
+
